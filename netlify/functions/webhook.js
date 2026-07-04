@@ -109,24 +109,24 @@ exports.handler = async (event, context) => {
     let shipmentsData = [];
     const contentType = event.headers['content-type'] || event.headers['Content-Type'] || '';
 
-    if (contentType.includes('application/json')) {
-      const bodyStr = event.isBase64Encoded 
-        ? Buffer.from(event.body, 'base64').toString('utf-8') 
-        : event.body;
-      
-      const payload = JSON.parse(bodyStr);
-      
-      // Ensure payload is an array
-      shipmentsData = Array.isArray(payload) ? payload : [payload];
-      
-    } else if (contentType.includes('multipart/form-data')) {
+    if (contentType.includes('multipart/form-data')) {
       const { fileData } = await parseMultipart(event);
       shipmentsData = parseExcelFile(fileData);
     } else {
-      return {
-        statusCode: 415,
-        body: JSON.stringify({ error: 'Unsupported Media Type. Use application/json or multipart/form-data.' }),
-      };
+      // Default to trying to parse as JSON if it's not multipart
+      try {
+        const bodyStr = event.isBase64Encoded 
+          ? Buffer.from(event.body, 'base64').toString('utf-8') 
+          : event.body;
+        
+        const payload = JSON.parse(bodyStr);
+        shipmentsData = Array.isArray(payload) ? payload : [payload];
+      } catch (err) {
+        return {
+          statusCode: 415,
+          body: JSON.stringify({ error: 'Unsupported Media Type or Invalid JSON. Please send application/json or multipart/form-data.' }),
+        };
+      }
     }
 
     if (shipmentsData.length > 1000) {
