@@ -1,0 +1,19 @@
+{
+  "name": "3pl-webhook",
+  "version": "1.0.0",
+  "description": "Serverless function for receiving 3PL logistics data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "googleapis": "^140.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.6.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
