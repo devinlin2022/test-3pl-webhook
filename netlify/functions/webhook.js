@@ -9,9 +9,13 @@ const xlsx = require('xlsx');
 // GOOGLE_SHEET_NAME (e.g., 'Sheet1')
 
 const getGoogleSheetsClient = () => {
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY 
-    ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n') 
-    : undefined;
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  if (privateKey) {
+    // Remove surrounding quotes if accidentally included during copy-paste
+    privateKey = privateKey.replace(/(^"|"$)/g, '').replace(/(^'|'$)/g, '');
+    // Replace escaped newlines with actual newlines
+    privateKey = privateKey.replace(/\\n/g, '\n');
+  }
 
   if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !privateKey) {
     throw new Error('Google Service Account credentials missing in environment variables.');
